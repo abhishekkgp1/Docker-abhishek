@@ -1,0 +1,28 @@
+version: '2'
+services:
+  db:
+    platform: linux/x86_64
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+    ports:
+      - "3306:3306"
+  redis:
+    image: 'redis:5-alpine'
+    command: redis-server
+    ports:
+      - '6379:6379'
+  web:
+    build: .
+    command: bin/rails server --port 3000 --binding 0.0.0.0
+    links:
+      - db
+      - redis
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/myapp
+    stdin_open: true
+    tty: true
